@@ -29,10 +29,13 @@ st.markdown("""
         border-radius: 12px;
         box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
+    h1 {
+        white-space: nowrap;
+    }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("InstaDish 🍽️")
+st.markdown("<h1>InstaDish 🍽️</h1>", unsafe_allow_html=True)
 st.caption("飲食店向けInstagram画像加工＋ハッシュタグ提案")
 
 st.subheader("1. 📷 写真をアップロード（複数OK）")
