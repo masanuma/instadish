@@ -1,10 +1,11 @@
 # instadish_light.py
 # CLIP と torch を除いた軽量版
 
-import streamlit as st
-from PIL import Image, ImageEnhance
 import io
 import uuid
+import streamlit as st
+from PIL import Image, ImageEnhance
+
 
 st.set_page_config(page_title="InstaDish | 飲食店インスタ画像アプリ", layout="centered")
 st.title("InstaDish 🍽️ | 飲食店向けInstagram画像加工＋ハッシュタグ提案")
