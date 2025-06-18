@@ -3,6 +3,7 @@ from PIL import Image, ImageEnhance, ImageDraw
 import io
 import numpy as np
 import cv2
+import random
 
 st.set_page_config(page_title="InstaDish | 飲食店インスタ画像アプリ", layout="centered")
 st.title("InstaDish 🍽️ | 飲食店向けInstagram画像加工＋ハッシュタグ提案")
@@ -40,6 +41,33 @@ def generate_hashtags(business, audience):
     if audience == "シニア": tags += ["#落ち着いた時間", "#大人の食事", "#ゆっくりごはん"]
     if audience == "OL": tags += ["#女子会ごはん", "#OLランチ", "#昼休みカフェ"]
     return sorted(set(tags))[:20]
+
+def generate_caption(business, audience):
+    intros = [
+        "今日のおすすめは…",
+        "ふらっと立ち寄ったら、これは外せない一品。",
+        "落ち着いた空間で味わう",
+        "常連さんにも大人気",
+        "SNSでも話題の",
+    ]
+    closes = [
+        "#ぜひお試しください",
+        "#お待ちしてます",
+        "#一杯いかがですか",
+        "#今夜のご褒美に",
+        "#今日のごはんに迷ったら",
+    ]
+    if business == "バー":
+        main = "こだわりのクラフトジンをご紹介。"
+    elif business == "カフェ":
+        main = "手作りスイーツと香り高いコーヒーでホッとひと息。"
+    elif business == "居酒屋":
+        main = "旬の味を気軽に楽しめる、こだわりの一皿。"
+    elif business == "和食":
+        main = "日本の季節を感じる、丁寧に仕上げた和のごちそう。"
+    else:
+        main = "シェフのおすすめをぜひどうぞ。"
+    return f"{random.choice(intros)} {main} {random.choice(closes)}"
 
 def process_image(image):
     enhancer_brightness = ImageEnhance.Brightness(image)
@@ -110,6 +138,9 @@ if uploaded_files:
             hashtags = generate_hashtags(business_type, target_audience)
             st.subheader("📌 おすすめハッシュタグ")
             st.code(" ".join(hashtags), language="markdown")
+
+            st.subheader("📝 キャプション候補")
+            st.markdown(generate_caption(business_type, target_audience))
 
             img_bytes = io.BytesIO()
             processed.save(img_bytes, format="JPEG")
