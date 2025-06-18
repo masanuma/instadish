@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 import torch
 import clip
+import uuid
 
 st.set_page_config(page_title="InstaDish | 飲食店インスタ画像アプリ", layout="centered")
 st.title("InstaDish 🍽️ | 飲食店向けInstagram画像加工＋ハッシュタグ提案")
@@ -86,6 +87,7 @@ def process_image(image):
 
 if uploaded_files and st.button("📸 画像を加工してハッシュタグを提案"):
     for i, file in enumerate(uploaded_files):
+        unique_key = str(uuid.uuid4())
         image = Image.open(file).convert("RGB")
         st.image(image, caption=f"元の画像: {file.name}", use_container_width=True)
 
@@ -96,7 +98,7 @@ if uploaded_files and st.button("📸 画像を加工してハッシュタグを
 
         if conf < 0.5:
             st.warning(f"画像分類の信頼度が低いため、内容を選んでください（信頼度 {conf:.2f}）")
-            label = st.selectbox(f"📌 内容ジャンルを選択 ({file.name})", all_labels, index=0, key=file.name)
+            label = st.selectbox("📌 内容ジャンルを選択", all_labels, index=0, key=f"select_{unique_key}")
         else:
             st.markdown(f"📌 自動判定ジャンル：**{label}**（信頼度 {conf:.2f}）")
 
@@ -113,7 +115,7 @@ if uploaded_files and st.button("📸 画像を加工してハッシュタグを
             data=img_bytes.getvalue(),
             file_name=f"instadish_{file.name}",
             mime="image/jpeg",
-            key=f"download_{i}"
+            key=f"download_{unique_key}"
         )
 else:
     st.info("画像をアップロードしてください。")
