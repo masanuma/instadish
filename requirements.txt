@@ -4,5 +4,5 @@ torch
 ftfy
 regex
 tqdm
-opencv-python-headless
+torch==2.2.2
 git+https://github.com/openai/CLIP.git
