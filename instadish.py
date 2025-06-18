@@ -17,6 +17,8 @@ st.markdown("""
     }
     h1 {
         white-space: nowrap;
+        font-size: clamp(1.5rem, 5vw, 2.2rem);
+        text-align: center;
     }
     .stButton > button {
         font-size: 1.1rem;
@@ -41,23 +43,23 @@ st.markdown("""
     [data-testid="stFileUploader"] button > div {
         visibility: hidden;
     }
-    /* セレクタの余白調整 */
+    /* セレクタの上下余白を縮める */
     div[data-testid="stSelectbox"] {
-        margin-top: 0.25rem !important;
-        margin-bottom: 0.25rem !important;
+        margin-top: 0rem !important;
+        margin-bottom: 0rem !important;
+        padding-top: 0rem !important;
+        padding-bottom: 0rem !important;
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-    <h1 style='text-align:center; font-size:clamp(1.5rem, 5vw, 2.2rem);'>InstaDish 🍽️ | 飲食店向けInstagram画像加工＋ハッシュタグ提案</h1>
-""", unsafe_allow_html=True)
+st.markdown("<h1>InstaDish 🍽️ | 飲食店向けInstagram画像加工＋ハッシュタグ提案</h1>", unsafe_allow_html=True)
 st.caption("by Masashi")
 
 # --- セクション 1 ---
 st.markdown("""
 <div style='background-color:#fef3c7; padding: 1.5em; border-radius: 12px;'>
-  <h3 style='margin:0; font-size:clamp(1rem, 4vw, 1.3rem);'>1. 📷 写真をアップロード（複数可）</h3>
+  <h3 style='margin:0; font-size:clamp(1rem, 4vw, 1.3rem); white-space: nowrap;'>1. 📷 写真をアップロード（複数可）</h3>
 """, unsafe_allow_html=True)
 uploaded_files = st.file_uploader("", type=["jpg", "jpeg", "png"], accept_multiple_files=True, label_visibility="collapsed")
 st.markdown("</div>", unsafe_allow_html=True)
@@ -68,7 +70,7 @@ if not uploaded_files:
 # --- セクション 2 ---
 st.markdown("""
 <div style='background-color:#e0f2fe; padding: 1.5em; border-radius: 12px;'>
-  <h3 style='margin:0; font-size:clamp(1rem, 4vw, 1.3rem);'>2. 🏷️ 業態とターゲット層</h3>
+  <h3 style='margin:0; font-size:clamp(1rem, 4vw, 1.3rem); white-space: nowrap;'>2. 🏷️ 業態とターゲット層</h3>
 """, unsafe_allow_html=True)
 business_type = st.selectbox("", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
 target_audience = st.selectbox("", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
