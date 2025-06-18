@@ -1,10 +1,10 @@
 import streamlit as st
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageEnhance, ImageStat
 import io
 import numpy as np
-import cv2
 import torch
 import clip
+import uuid
 
 st.set_page_config(page_title="InstaDish | 飲食店インスタ画像アプリ", layout="centered")
 st.title("InstaDish 🍽️ | 飲食店向けInstagram画像加工＋ハッシュタグ提案")
@@ -96,8 +96,7 @@ if uploaded_files and st.button("📸 画像を加工してハッシュタグを
 
         if conf < 0.5:
             st.warning(f"画像分類の信頼度が低いため、内容を選んでください（信頼度 {conf:.2f}）")
-            select_key = f"select_{file.name}_{i}"
-            label = st.selectbox("📌 内容ジャンルを選択", all_labels, index=0, key=select_key)
+            label = st.selectbox("📌 内容ジャンルを選択", all_labels, index=0, key=f"select_{file.name}_{i}")
         else:
             st.markdown(f"📌 自動判定ジャンル：**{label}**（信頼度 {conf:.2f}）")
 
@@ -109,14 +108,12 @@ if uploaded_files and st.button("📸 画像を加工してハッシュタグを
 
         img_bytes = io.BytesIO()
         processed.save(img_bytes, format="JPEG")
-
-        download_key = f"download_{file.name}_{i}"
         st.download_button(
             label=f"📥 加工画像をダウンロード（{file.name}）",
             data=img_bytes.getvalue(),
             file_name=f"instadish_{file.name}",
             mime="image/jpeg",
-            key=download_key
+            key=f"download_{file.name}_{i}"
         )
 else:
     st.info("画像をアップロードしてください。")
