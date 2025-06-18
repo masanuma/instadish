@@ -33,7 +33,7 @@ st.caption("飲食店向けInstagram画像加工＋ハッシュタグ提案")
 # セクション1：アップロード
 st.markdown("""
 <div style='background-color:#fef3c7; padding: 1.5em; border-radius: 12px;'>
-<h3 style='margin:0; margin-bottom:1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>1. 📷 写真をアップロード（複数可）</h3>
+<h3 style='margin:0; margin-bottom:1em; font-size: clamp(1rem, 4vw, 1.3rem); white-space: nowrap;'>1. 📷 写真をアップロード（複数可）</h3>
 """, unsafe_allow_html=True)
 uploaded_files = st.file_uploader("画像を選択してください", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 st.markdown("</div>", unsafe_allow_html=True)
@@ -41,7 +41,7 @@ st.markdown("</div>", unsafe_allow_html=True)
 # セクション2：業態とターゲット
 st.markdown("""
 <div style='background-color:#e0f2fe; padding: 1.5em; border-radius: 12px;'>
-<h3 style='margin:0; margin-bottom:1em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;'>2. 🏷️ 業態とターゲット層</h3>
+<h3 style='margin:0; margin-bottom:1em; font-size: clamp(1rem, 4vw, 1.3rem); white-space: nowrap;'>2. 🏷️ 業態とターゲット層</h3>
 """, unsafe_allow_html=True)
 business_type = st.selectbox("業態", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
 target_audience = st.selectbox("ターゲット層", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
