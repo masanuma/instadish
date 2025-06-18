@@ -31,35 +31,29 @@ st.markdown("<h1>InstaDish 🍽️</h1>", unsafe_allow_html=True)
 st.caption("飲食店向けInstagram画像加工＋ハッシュタグ提案")
 
 # セクション1：アップロード
-with st.container():
-    st.markdown("""
-        <div style='background-color:#fef3c7; padding: 1.5em; border-radius: 12px;'>
-        <h3 style='margin-top:0; margin-bottom:1em; white-space: nowrap;'>1. 📷 写真をアップロード（複数可）</h3>
-    """, unsafe_allow_html=True)
-    col = st.columns([1])
-    with col[0]:
-        uploaded_files = st.file_uploader("画像を選択してください", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
-    st.markdown("</div>", unsafe_allow_html=True)
+st.markdown("""
+<div style='background-color:#fef3c7; padding: 1.5em; border-radius: 12px;'>
+<h3 style='margin:0; margin-bottom:1em; white-space: nowrap;'>1. 📷 写真をアップロード（複数可）</h3>
+""", unsafe_allow_html=True)
+uploaded_files = st.file_uploader("画像を選択してください", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
 # セクション2：業態とターゲット
-with st.container():
+st.markdown("""
+<div style='background-color:#e0f2fe; padding: 1.5em; border-radius: 12px;'>
+<h3 style='margin:0; margin-bottom:1em; white-space: nowrap;'>2. 🏷️ 業態とターゲット層</h3>
+""", unsafe_allow_html=True)
+business_type = st.selectbox("業態", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
+target_audience = st.selectbox("ターゲット層", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
+with st.expander("📸 撮影アドバイス"):
     st.markdown("""
-        <div style='background-color:#e0f2fe; padding: 1.5em; border-radius: 12px;'>
-        <h3 style='margin-top:0; margin-bottom:1em; white-space: nowrap;'>2. 🏷️ 業態とターゲット層</h3>
-    """, unsafe_allow_html=True)
-    col = st.columns([1])
-    with col[0]:
-        business_type = st.selectbox("業態", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
-        target_audience = st.selectbox("ターゲット層", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
-        with st.expander("📸 撮影アドバイス"):
-            st.markdown("""
-            - **ドリンク**：グラスの高さを活かして斜め下から
-            - **カフェメニュー**：真上から全体をきれいに
-            - **バーの雰囲気**：ラベルや照明を活かしたローアングル
-            - **複数皿の料理**：奥行きを出すように45度で
-            - **ラベル重視**：中央配置＋明るさ重視
-            """)
-    st.markdown("</div>", unsafe_allow_html=True)
+    - **ドリンク**：グラスの高さを活かして斜め下から
+    - **カフェメニュー**：真上から全体をきれいに
+    - **バーの雰囲気**：ラベルや照明を活かしたローアングル
+    - **複数皿の料理**：奥行きを出すように45度で
+    - **ラベル重視**：中央配置＋明るさ重視
+    """)
+st.markdown("</div>", unsafe_allow_html=True)
 
 def process_image(image):
     enhancer = ImageEnhance.Brightness(image).enhance(1.2)
