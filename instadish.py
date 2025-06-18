@@ -16,7 +16,6 @@ st.markdown("""
         margin: auto;
     }
     h1 {
-        white-space: nowrap;
         font-size: clamp(1.5rem, 5vw, 2.2rem);
         text-align: center;
     }
@@ -47,8 +46,6 @@ st.markdown("""
     div[data-testid="stSelectbox"] {
         margin-top: 0rem !important;
         margin-bottom: 0rem !important;
-        padding-top: 0rem !important;
-        padding-bottom: 0rem !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -88,4 +85,23 @@ if uploaded_files:
         - **パッケージやラベルが重要な場合**：中央配置＋明るさ重視
         """)
 
-# 今後の機能追加（画像処理、分類など）をここに実装可能
+# --- 加工ボタンとアップロード処理 ---
+if uploaded_files:
+    if st.button("🎨 加工してハッシュタグを提案"):
+        for file in uploaded_files:
+            image = Image.open(file).convert("RGB")
+            st.image(image, caption=f"元画像: {file.name}", use_container_width=True)
+            enhancer = ImageEnhance.Brightness(image).enhance(1.2)
+            enhancer = ImageEnhance.Contrast(enhancer).enhance(1.3)
+            processed = ImageEnhance.Sharpness(enhancer).enhance(2.0)
+            st.image(processed, caption="加工済み画像", use_container_width=True)
+
+            img_bytes = io.BytesIO()
+            processed.save(img_bytes, format="JPEG")
+            st.download_button(
+                label=f"📅 加工画像をダウンロード（{file.name}）",
+                data=img_bytes.getvalue(),
+                file_name=f"instadish_{file.name}",
+                mime="image/jpeg",
+                key=f"dl_{uuid.uuid4()}"
+            )
