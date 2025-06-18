@@ -1,7 +1,2 @@
 streamlit
 Pillow
-ftfy
-regex
-tqdm
-git+https://github.com/openai/CLIP.git
-torch==2.2.2+cpu -f https://download.pytorch.org/whl/torch_stable.html
