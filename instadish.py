@@ -25,7 +25,6 @@ with st.expander("📷 撮影アドバイスを見る"):
     - **パッケージやラベルが重要な場合**：中央配置＋明るさ重視
     """)
 
-# ハッシュタグ生成関数
 def generate_hashtags(business, audience):
     tags = ["#InstaFood", "#グルメ", "#食べスタグラム", "#おしゃれごはん"]
     if business == "カフェ": tags += ["#カフェ巡り", "#CafeTime", "#コーヒー好き"]
@@ -42,7 +41,6 @@ def generate_hashtags(business, audience):
     if audience == "OL": tags += ["#女子会ごはん", "#OLランチ", "#昼休みカフェ"]
     return sorted(set(tags))[:20]
 
-# 加工関数
 def process_image(image):
     enhancer_brightness = ImageEnhance.Brightness(image)
     bright_image = enhancer_brightness.enhance(1.2)
@@ -56,7 +54,6 @@ def process_image(image):
     b = b.point(lambda i: int(i * 0.9))
     return Image.merge("RGB", (r, g, b))
 
-# 構図チェックAI
 def check_composition(pil_image):
     np_image = np.array(pil_image)
     gray = cv2.cvtColor(np_image, cv2.COLOR_RGB2GRAY)
@@ -65,10 +62,8 @@ def check_composition(pil_image):
     height, width = gray.shape
     center_x, center_y = width // 2, height // 2
     label = "✅ 構図チェック結果："
-
     if len(contours) == 0:
         return label + "被写体が検出できませんでした（画像が暗い/ぼやけている可能性あり）"
-
     largest = max(contours, key=cv2.contourArea)
     M = cv2.moments(largest)
     if M["m00"] == 0:
@@ -87,6 +82,16 @@ def check_composition(pil_image):
         feedback.append("縦構図または正方形。SNS向きです")
     return label + " / ".join(feedback)
 
+def generate_crop_preview(pil_image):
+    width, height = pil_image.size
+    center_x, center_y = width // 2, height // 2
+    crop_size = min(width, height)
+    box_1to1 = (center_x - crop_size//2, center_y - crop_size//2, center_x + crop_size//2, center_y + crop_size//2)
+    box_4to5 = (center_x - crop_size//2, center_y - int(crop_size*0.4), center_x + crop_size//2, center_y + int(crop_size*0.6))
+    crop_1to1 = pil_image.crop(box_1to1)
+    crop_4to5 = pil_image.crop(box_4to5)
+    return crop_1to1, crop_4to5
+
 if uploaded_files:
     if st.button("📸 画像を加工してハッシュタグを提案"):
         for uploaded_file in uploaded_files:
@@ -94,6 +99,10 @@ if uploaded_files:
             st.image(image, caption=f"元の画像: {uploaded_file.name}", use_container_width=True)
 
             st.markdown(check_composition(image))
+
+            crop1, crop2 = generate_crop_preview(image)
+            st.image(crop1, caption="トリミング候補（1:1）", use_container_width=True)
+            st.image(crop2, caption="トリミング候補（4:5）", use_container_width=True)
 
             processed = process_image(image)
             st.image(processed, caption="加工済み画像", use_container_width=True)
