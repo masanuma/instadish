@@ -4,6 +4,8 @@ import io
 import numpy as np
 import cv2
 import random
+import torch
+import clip
 
 st.set_page_config(page_title="InstaDish | 飲食店インスタ画像アプリ", layout="centered")
 st.title("InstaDish 🍽️ | 飲食店向けInstagram画像加工＋ハッシュタグ提案")
@@ -42,32 +44,42 @@ def generate_hashtags(business, audience):
     if audience == "OL": tags += ["#女子会ごはん", "#OLランチ", "#昼休みカフェ"]
     return sorted(set(tags))[:20]
 
-def generate_caption(business, audience):
-    intros = [
-        "今日のおすすめは…",
-        "ふらっと立ち寄ったら、これは外せない一品。",
-        "落ち着いた空間で味わう",
-        "常連さんにも大人気",
-        "SNSでも話題の",
+@st.cache_resource
+def load_clip_model():
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model, preprocess = clip.load("ViT-B/32", device=device)
+    return model, preprocess, device
+
+def classify_image_clip(image):
+    model, preprocess, device = load_clip_model()
+    class_names = [
+        "cocktail", "sushi", "ramen", "cake", "steak", "pizza", "bar counter", "candlelight", "bottle", "coffee"
     ]
-    closes = [
-        "#ぜひお試しください",
-        "#お待ちしてます",
-        "#一杯いかがですか",
-        "#今夜のご褒美に",
-        "#今日のごはんに迷ったら",
-    ]
-    if business == "バー":
-        main = "こだわりのクラフトジンをご紹介。"
-    elif business == "カフェ":
-        main = "手作りスイーツと香り高いコーヒーでホッとひと息。"
-    elif business == "居酒屋":
-        main = "旬の味を気軽に楽しめる、こだわりの一皿。"
-    elif business == "和食":
-        main = "日本の季節を感じる、丁寧に仕上げた和のごちそう。"
-    else:
-        main = "シェフのおすすめをぜひどうぞ。"
-    return f"{random.choice(intros)} {main} {random.choice(closes)}"
+    inputs = torch.cat([clip.tokenize(f"a photo of {c}") for c in class_names]).to(device)
+    image_input = preprocess(image).unsqueeze(0).to(device)
+    with torch.no_grad():
+        image_features = model.encode_image(image_input)
+        text_features = model.encode_text(inputs)
+        logits_per_image, _ = model(image_input, inputs)
+        probs = logits_per_image.softmax(dim=-1).cpu().numpy()
+    return class_names[np.argmax(probs)], max(probs[0])
+
+def generate_caption(label, confidence):
+    phrases = {
+        "cocktail": "夜の時間にぴったりな一杯を。",
+        "sushi": "一貫一貫に心を込めて。",
+        "ramen": "スープまで飲み干したくなる美味しさ。",
+        "cake": "甘い時間をお楽しみください。",
+        "steak": "ジューシーでボリュームたっぷり。",
+        "pizza": "チーズたっぷりでアツアツ。",
+        "bar counter": "静かな夜にしっとりと。",
+        "candlelight": "灯りに包まれた癒しの空間。",
+        "bottle": "こだわりのボトルがずらり。",
+        "coffee": "午後の休息に、ほっとひと息。"
+    }
+    if confidence < 0.3:
+        return "雰囲気を大切にした一枚です。ぜひチェックしてみてください。"
+    return phrases.get(label, "おすすめの一品です。ぜひご賞味ください！")
 
 def process_image(image):
     enhancer_brightness = ImageEnhance.Brightness(image)
@@ -135,12 +147,14 @@ if uploaded_files:
             processed = process_image(image)
             st.image(processed, caption="加工済み画像", use_container_width=True)
 
+            label, conf = classify_image_clip(image)
+            caption = generate_caption(label, conf)
+            st.subheader("📝 キャプション候補")
+            st.markdown(f"{caption}（推定カテゴリ: {label}, 信頼度: {conf:.2f}）")
+
             hashtags = generate_hashtags(business_type, target_audience)
             st.subheader("📌 おすすめハッシュタグ")
             st.code(" ".join(hashtags), language="markdown")
-
-            st.subheader("📝 キャプション候補")
-            st.markdown(generate_caption(business_type, target_audience))
 
             img_bytes = io.BytesIO()
             processed.save(img_bytes, format="JPEG")
