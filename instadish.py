@@ -3,7 +3,6 @@ import streamlit as st
 from PIL import Image, ImageEnhance
 import io
 import numpy as np
-import cv2
 import torch
 import clip
 import uuid
@@ -103,7 +102,7 @@ if uploaded_files and st.button("📸 画像を加工してハッシュタグを
         else:
             st.markdown(f"📌 自動判定ジャンル：**{label}**（信頼度 {conf:.2f}）")
 
-        st.subheader("📝 自動キャプション")
+        st.subheader("🖍 自動キャプション")
         st.markdown(generate_caption(label))
 
         st.subheader("📌 ハッシュタグ候補")
@@ -112,7 +111,7 @@ if uploaded_files and st.button("📸 画像を加工してハッシュタグを
         img_bytes = io.BytesIO()
         processed.save(img_bytes, format="JPEG")
         st.download_button(
-            label=f"📥 加工画像をダウンロード（{file.name}）",
+            label=f"📅 加工画像をダウンロード（{file.name}）",
             data=img_bytes.getvalue(),
             file_name=f"instadish_{file.name}",
             mime="image/jpeg",
