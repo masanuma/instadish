@@ -6,7 +6,7 @@ import uuid
 
 st.set_page_config(page_title="InstaDish | 飲食店インスタ画像アプリ", layout="centered")
 
-# カスタムスタイル：アップローダーのD&D部分を非表示 + ボタンラベルを日本語化
+# カスタムスタイル
 st.markdown("""
     <style>
     .block-container {
@@ -40,6 +40,11 @@ st.markdown("""
     }
     [data-testid="stFileUploader"] button > div {
         visibility: hidden;
+    }
+    /* セレクタの余白調整 */
+    div[data-testid="stSelectbox"] {
+        margin-top: 0.25rem !important;
+        margin-bottom: 0.25rem !important;
     }
     </style>
 """, unsafe_allow_html=True)
