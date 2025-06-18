@@ -85,9 +85,9 @@ def process_image(image):
     return ImageEnhance.Sharpness(enhancer).enhance(2.0)
 
 if uploaded_files and st.button("📸 画像を加工してハッシュタグを提案"):
-    for file in uploaded_files:
+    for i, file in enumerate(uploaded_files):
         image = Image.open(file).convert("RGB")
-        st.image(image, caption="元の画像", use_container_width=True)
+        st.image(image, caption=f"元の画像: {file.name}", use_container_width=True)
 
         processed = process_image(image)
         st.image(processed, caption="加工済み画像", use_container_width=True)
@@ -96,7 +96,7 @@ if uploaded_files and st.button("📸 画像を加工してハッシュタグを
 
         if conf < 0.5:
             st.warning(f"画像分類の信頼度が低いため、内容を選んでください（信頼度 {conf:.2f}）")
-            label = st.selectbox("📌 内容ジャンルを選択", all_labels, index=0)
+            label = st.selectbox(f"📌 内容ジャンルを選択 ({file.name})", all_labels, index=0, key=file.name)
         else:
             st.markdown(f"📌 自動判定ジャンル：**{label}**（信頼度 {conf:.2f}）")
 
@@ -108,6 +108,12 @@ if uploaded_files and st.button("📸 画像を加工してハッシュタグを
 
         img_bytes = io.BytesIO()
         processed.save(img_bytes, format="JPEG")
-        st.download_button("📥 加工画像をダウンロード", data=img_bytes.getvalue(), file_name="instadish_processed.jpg", mime="image/jpeg")
+        st.download_button(
+            label=f"📥 加工画像をダウンロード（{file.name}）",
+            data=img_bytes.getvalue(),
+            file_name=f"instadish_{file.name}",
+            mime="image/jpeg",
+            key=f"download_{i}"
+        )
 else:
     st.info("画像をアップロードしてください。")
