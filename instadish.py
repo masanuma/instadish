@@ -15,7 +15,7 @@ st.markdown("""
 <div style='background-color:#fef3c7; padding: 1.5em; border-radius: 12px;'>
   <h3 style='margin:0; font-size:clamp(1rem, 4vw, 1.3rem);'>1. 📷 写真をアップロード（複数可）</h3>
 """, unsafe_allow_html=True)
-uploaded_files = st.file_uploader("", type=["jpg", "jpeg", "png"], accept_multiple_files=True, label_visibility="collapsed")
+uploaded_files = st.file_uploader("ファイル選択", type=["jpg", "jpeg", "png"], accept_multiple_files=True, label_visibility="visible")
 st.markdown("</div>", unsafe_allow_html=True)
 
 if not uploaded_files:
@@ -26,8 +26,8 @@ st.markdown("""
 <div style='background-color:#e0f2fe; padding: 1.5em; border-radius: 12px;'>
   <h3 style='margin:0; font-size:clamp(1rem, 4vw, 1.3rem);'>2. 🏷️ 業態とターゲット層</h3>
 """, unsafe_allow_html=True)
-business_type = st.selectbox("業態", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
-target_audience = st.selectbox("ターゲット層", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
+business_type = st.selectbox("", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
+target_audience = st.selectbox("", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
 st.markdown("</div>", unsafe_allow_html=True)
 
 # --- 撮影アドバイス ---
