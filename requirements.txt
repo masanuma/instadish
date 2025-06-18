@@ -1,9 +1,8 @@
 streamlit
-pillow
-opencv-python-headless
+Pillow
 torch
-torchvision
 ftfy
 regex
-clip-anytorch
+tqdm
+opencv-python-headless
 git+https://github.com/openai/CLIP.git
