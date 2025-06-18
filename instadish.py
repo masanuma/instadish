@@ -21,26 +21,26 @@ st.markdown("""
         background-color: #ffedd5;
         color: #111827;
     }
-    .stSelectbox label, .stFileUploader label, .stSelectbox div, .stFileUploader div {
-        background-color: inherit;
-    }
-    .uploadedImage img {
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    }
     h1 {
         white-space: nowrap;
     }
-    .section1, .section1 * {
-        background-color: #fef3c7 !important;
-    }
-    .section2, .section2 * {
-        background-color: #e0f2fe !important;
-    }
-    .section1, .section2 {
-        padding: 1em;
+    .section1 {
+        background-color: #fef3c7;
+        padding: 1.5em;
         border-radius: 12px;
         margin-bottom: 1em;
+    }
+    .section2 {
+        background-color: #e0f2fe;
+        padding: 1.5em;
+        border-radius: 12px;
+        margin-bottom: 1em;
+    }
+    .section1 label, .section1 .stFileUploader, .section1 .stMarkdown {
+        background-color: #fef3c7 !important;
+    }
+    .section2 label, .section2 .stSelectbox, .section2 .stMarkdown {
+        background-color: #e0f2fe !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -48,33 +48,27 @@ st.markdown("""
 st.markdown("<h1>InstaDish 🍽️</h1>", unsafe_allow_html=True)
 st.caption("飲食店向けInstagram画像加工＋ハッシュタグ提案")
 
-st.markdown("""
-<div class='section1'>
-<h2 style='white-space: nowrap; font-size: 1.2rem; margin-top: 0;'>
-1. 📷 写真をアップロード（複数可）
-</h2>
-""", unsafe_allow_html=True)
-uploaded_files = st.file_uploader("画像を選択してください", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
-st.markdown("</div>", unsafe_allow_html=True)
+with st.container():
+    st.markdown("<div class='section1'>", unsafe_allow_html=True)
+    st.markdown("<h2 style='white-space: nowrap; font-size: 1.2rem;'>1. 📷 写真をアップロード（複数可）</h2>", unsafe_allow_html=True)
+    uploaded_files = st.file_uploader("画像を選択してください", type=["jpg", "jpeg", "png"], accept_multiple_files=True, label_visibility="visible")
+    st.markdown("</div>", unsafe_allow_html=True)
 
-st.markdown("""
-<div class='section2'>
-<h2 style='white-space: nowrap; font-size: 1.2rem; margin-top: 0;'>
-2. 🏷️ 業態とターゲット層
-</h2>
-""", unsafe_allow_html=True)
-business_type = st.selectbox("業態", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
-target_audience = st.selectbox("ターゲット層", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
+with st.container():
+    st.markdown("<div class='section2'>", unsafe_allow_html=True)
+    st.markdown("<h2 style='white-space: nowrap; font-size: 1.2rem;'>2. 🏷️ 業態とターゲット層</h2>", unsafe_allow_html=True)
+    business_type = st.selectbox("業態", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
+    target_audience = st.selectbox("ターゲット層", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
 
-with st.expander("📸 撮影アドバイス"):
-    st.markdown("""
-    - **ドリンク**：グラスの高さを活かして斜め下から
-    - **カフェメニュー**：真上から全体をきれいに
-    - **バーの雰囲気**：ラベルや照明を活かしたローアングル
-    - **複数皿の料理**：奥行きを出すように45度で
-    - **ラベル重視**：中央配置＋明るさ重視
-    """)
-st.markdown("</div>", unsafe_allow_html=True)
+    with st.expander("📸 撮影アドバイス"):
+        st.markdown("""
+        - **ドリンク**：グラスの高さを活かして斜め下から
+        - **カフェメニュー**：真上から全体をきれいに
+        - **バーの雰囲気**：ラベルや照明を活かしたローアングル
+        - **複数皿の料理**：奥行きを出すように45度で
+        - **ラベル重視**：中央配置＋明るさ重視
+        """)
+    st.markdown("</div>", unsafe_allow_html=True)
 
 def process_image(image):
     enhancer = ImageEnhance.Brightness(image).enhance(1.2)
