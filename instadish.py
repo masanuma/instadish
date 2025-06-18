@@ -38,10 +38,18 @@ st.markdown("""
 st.markdown("<h1>InstaDish 🍽️</h1>", unsafe_allow_html=True)
 st.caption("飲食店向けInstagram画像加工＋ハッシュタグ提案")
 
-st.subheader("1. 📷 写真をアップロード（複数OK）")
+st.markdown("""
+<h2 style='white-space: nowrap; font-size: 1.2rem; margin-top: 1.5em;'>
+1. 📷 写真をアップロード（複数可）
+</h2>
+""", unsafe_allow_html=True)
 uploaded_files = st.file_uploader("画像を選択してください", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
-st.subheader("2. 🏷️ 業態とターゲット層")
+st.markdown("""
+<h2 style='white-space: nowrap; font-size: 1.2rem; margin-top: 1.5em;'>
+2. 🏷️ 業態とターゲット層
+</h2>
+""", unsafe_allow_html=True)
 business_type = st.selectbox("業態", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
 target_audience = st.selectbox("ターゲット層", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
 
@@ -93,3 +101,5 @@ if uploaded_files and st.button("✨ 加工してハッシュタグを提案"):
             mime="image/jpeg",
             key=f"dl_{uuid.uuid4()}"
         )
+else:
+    st.info("画像をアップロードしてください。")
