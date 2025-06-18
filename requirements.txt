@@ -1,8 +1,7 @@
-streamlit
-pillow
+streamlit>=1.35.0
+Pillow
 numpy
 torch
-torchvision
 opencv-python-headless
 ftfy
 regex
