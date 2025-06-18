@@ -1,15 +1,13 @@
 import streamlit as st
-from PIL import Image, ImageEnhance
+from PIL import Image, ImageEnhance, ImageDraw
 import io
+import numpy as np
+import cv2
 
-# ---------------------------
-# 設定
 st.set_page_config(page_title="InstaDish | 飲食店インスタ画像アプリ", layout="centered")
 st.title("InstaDish 🍽️ | 飲食店向けInstagram画像加工＋ハッシュタグ提案")
 st.caption("by Masashi")
 
-# ---------------------------
-# 入力フォーム
 st.header("1. 写真をアップロード（複数可）")
 uploaded_files = st.file_uploader("料理・ドリンクなどの写真を選んでください（複数選択OK）", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
@@ -17,7 +15,6 @@ st.header("2. 業態とターゲット層を選択")
 business_type = st.selectbox("業態を選んでください", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
 target_audience = st.selectbox("ターゲット層を選んでください", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
 
-# 撮影アドバイス
 with st.expander("📷 撮影アドバイスを見る"):
     st.markdown("""
     ### 📸 ジャンル別おすすめ撮影ポイント
@@ -28,45 +25,24 @@ with st.expander("📷 撮影アドバイスを見る"):
     - **パッケージやラベルが重要な場合**：中央配置＋明るさ重視
     """)
 
-# ---------------------------
 # ハッシュタグ生成関数
-
 def generate_hashtags(business, audience):
-    tags = []
-    base_tags = ["#InstaFood", "#グルメ", "#食べスタグラム", "#おしゃれごはん"]
-    tags.extend(base_tags)
-
-    if business == "カフェ":
-        tags += ["#カフェ巡り", "#CafeTime", "#コーヒー好き"]
-    elif business == "居酒屋":
-        tags += ["#居酒屋メシ", "#日本酒好き", "#大衆酒場"]
-    elif business == "バー":
-        tags += ["#BarTime", "#クラフトジン", "#隠れ家バー"]
-    elif business == "エスニック":
-        tags += ["#エスニック料理", "#SpicyLovers", "#アジアごはん"]
-    elif business == "和食":
-        tags += ["#和食", "#JapaneseCuisine", "#美味しい和食"]
-    elif business == "洋食":
-        tags += ["#洋食ランチ", "#WesternFood", "#おしゃれディナー"]
-    elif business == "中華":
-        tags += ["#中華料理", "#DimSum", "#本格中華"]
-
-    if audience == "インスタ好き":
-        tags += ["#映えグルメ", "#フォトジェニック", "#SNS映え"]
-    elif audience == "外国人観光客":
-        tags += ["#VisitJapan", "#TokyoFoodie", "#JapaneseCulture"]
-    elif audience == "会社員":
-        tags += ["#ランチタイム", "#お疲れ様です", "#仕事帰りグルメ"]
-    elif audience == "シニア":
-        tags += ["#落ち着いた時間", "#大人の食事", "#ゆっくりごはん"]
-    elif audience == "OL":
-        tags += ["#女子会ごはん", "#OLランチ", "#昼休みカフェ"]
-
+    tags = ["#InstaFood", "#グルメ", "#食べスタグラム", "#おしゃれごはん"]
+    if business == "カフェ": tags += ["#カフェ巡り", "#CafeTime", "#コーヒー好き"]
+    if business == "居酒屋": tags += ["#居酒屋メシ", "#日本酒好き", "#大衆酒場"]
+    if business == "バー": tags += ["#BarTime", "#クラフトジン", "#隠れ家バー"]
+    if business == "エスニック": tags += ["#エスニック料理", "#SpicyLovers", "#アジアごはん"]
+    if business == "和食": tags += ["#和食", "#JapaneseCuisine", "#美味しい和食"]
+    if business == "洋食": tags += ["#洋食ランチ", "#WesternFood", "#おしゃれディナー"]
+    if business == "中華": tags += ["#中華料理", "#DimSum", "#本格中華"]
+    if audience == "インスタ好き": tags += ["#映えグルメ", "#フォトジェニック", "#SNS映え"]
+    if audience == "外国人観光客": tags += ["#VisitJapan", "#TokyoFoodie", "#JapaneseCulture"]
+    if audience == "会社員": tags += ["#ランチタイム", "#お疲れ様です", "#仕事帰りグルメ"]
+    if audience == "シニア": tags += ["#落ち着いた時間", "#大人の食事", "#ゆっくりごはん"]
+    if audience == "OL": tags += ["#女子会ごはん", "#OLランチ", "#昼休みカフェ"]
     return sorted(set(tags))[:20]
 
-# ---------------------------
-# 画像加工関数
-
+# 加工関数
 def process_image(image):
     enhancer_brightness = ImageEnhance.Brightness(image)
     bright_image = enhancer_brightness.enhance(1.2)
@@ -78,16 +54,46 @@ def process_image(image):
     r = r.point(lambda i: min(255, int(i * 1.1)))
     g = g.point(lambda i: min(255, int(i * 1.05)))
     b = b.point(lambda i: int(i * 0.9))
-    warm_image = Image.merge("RGB", (r, g, b))
-    return warm_image
+    return Image.merge("RGB", (r, g, b))
 
-# ---------------------------
-# 加工開始ボタン
+# 構図チェックAI
+def check_composition(pil_image):
+    np_image = np.array(pil_image)
+    gray = cv2.cvtColor(np_image, cv2.COLOR_RGB2GRAY)
+    edges = cv2.Canny(gray, 100, 200)
+    contours, _ = cv2.findContours(edges, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    height, width = gray.shape
+    center_x, center_y = width // 2, height // 2
+    label = "✅ 構図チェック結果："
+
+    if len(contours) == 0:
+        return label + "被写体が検出できませんでした（画像が暗い/ぼやけている可能性あり）"
+
+    largest = max(contours, key=cv2.contourArea)
+    M = cv2.moments(largest)
+    if M["m00"] == 0:
+        return label + "被写体の中心を特定できません"
+    cx, cy = int(M["m10"] / M["m00"]), int(M["m01"] / M["m00"])
+    offset_x = abs(cx - center_x) / width
+    offset_y = abs(cy - center_y) / height
+    feedback = []
+    if offset_x < 0.1 and offset_y < 0.1:
+        feedback.append("中心配置OK")
+    else:
+        feedback.append("構図を中心に近づけるとより良いです")
+    if width / height > 1.2:
+        feedback.append("横長構図。余白のバランスを確認しましょう")
+    else:
+        feedback.append("縦構図または正方形。SNS向きです")
+    return label + " / ".join(feedback)
+
 if uploaded_files:
     if st.button("📸 画像を加工してハッシュタグを提案"):
         for uploaded_file in uploaded_files:
             image = Image.open(uploaded_file).convert("RGB")
             st.image(image, caption=f"元の画像: {uploaded_file.name}", use_container_width=True)
+
+            st.markdown(check_composition(image))
 
             processed = process_image(image)
             st.image(processed, caption="加工済み画像", use_container_width=True)
@@ -98,8 +104,6 @@ if uploaded_files:
 
             img_bytes = io.BytesIO()
             processed.save(img_bytes, format="JPEG")
-
-            # 🔧 ダウンロードボタンにユニークな名前をつける
             st.download_button(
                 label=f"📥 加工画像をダウンロード（{uploaded_file.name}）",
                 data=img_bytes.getvalue(),
