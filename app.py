@@ -14,8 +14,8 @@ st.header("1. 写真をアップロード（複数可）")
 uploaded_files = st.file_uploader("料理・ドリンクなどの写真を選んでください（複数選択OK）", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
 st.header("2. 業態とターゲット層を選択")
-business_type = st.selectbox("業態を選んでください", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"], key="business_type")
-target_audience = st.selectbox("ターゲット層を選んでください", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"], key="audience")
+business_type = st.selectbox("業態を選んでください", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
+target_audience = st.selectbox("ターゲット層を選んでください", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
 
 with st.expander("📷 撮影アドバイスを見る"):
     st.markdown("""
@@ -80,46 +80,42 @@ def generate_hashtags(business, audience):
     return sorted(set(tags))[:20]
 
 def process_image(image):
+    if max(image.size) > 1280:
+        image.thumbnail((1280, 1280))
     enhancer = ImageEnhance.Brightness(image).enhance(1.2)
     enhancer = ImageEnhance.Contrast(enhancer).enhance(1.3)
     return ImageEnhance.Sharpness(enhancer).enhance(2.0)
 
-if uploaded_files and st.button("📸 画像を加工してハッシュタグを提案"):
-    model, preprocess, device = load_clip_model()
-    for file in uploaded_files:
-        image_id = str(uuid.uuid4())
+if uploaded_files:
+    for i, file in enumerate(uploaded_files):
         image = Image.open(file).convert("RGB")
         st.image(image, caption=f"元の画像: {file.name}", use_container_width=True)
 
-        processed = process_image(image)
-        st.image(processed, caption="加工済み画像", use_container_width=True)
+        if st.button(f"📸 加工開始（{file.name}）", key=f"process_{i}"):
+            processed = process_image(image)
+            st.image(processed, caption="加工済み画像", use_container_width=True)
 
-        if f"label_{image_id}" not in st.session_state:
             label, conf, all_labels = classify_image_clip(image)
+
             if conf < 0.5:
-                st.warning(f"画像分類の信頼度が低いため、内容を選んでください（信頼度 {conf:.2f}）")
-                label = st.selectbox("📌 内容ジャンルを選択", all_labels, index=0, key=f"select_{image_id}")
+                label = st.selectbox("📌 内容ジャンルを選択", all_labels, index=0, key=f"select_{i}")
             else:
                 st.markdown(f"📌 自動判定ジャンル：**{label}**（信頼度 {conf:.2f}）")
-            st.session_state[f"label_{image_id}"] = label
-        else:
-            label = st.session_state[f"label_{image_id}"]
-            st.markdown(f"📌 選択済ジャンル：**{label}**")
 
-        st.subheader("📝 自動キャプション")
-        st.markdown(generate_caption(label))
+            st.subheader("📝 自動キャプション")
+            st.markdown(generate_caption(label))
 
-        st.subheader("📌 ハッシュタグ候補")
-        st.code(" ".join(generate_hashtags(business_type, target_audience)))
+            st.subheader("📌 ハッシュタグ候補")
+            st.code(" ".join(generate_hashtags(business_type, target_audience)))
 
-        img_bytes = io.BytesIO()
-        processed.save(img_bytes, format="JPEG")
-        st.download_button(
-            label=f"📥 加工画像をダウンロード（{file.name}）",
-            data=img_bytes.getvalue(),
-            file_name=f"instadish_{file.name}",
-            mime="image/jpeg",
-            key=f"download_{image_id}"
-        )
+            img_bytes = io.BytesIO()
+            processed.save(img_bytes, format="JPEG")
+            st.download_button(
+                label=f"📥 加工画像をダウンロード（{file.name}）",
+                data=img_bytes.getvalue(),
+                file_name=f"instadish_{file.name}",
+                mime="image/jpeg",
+                key=f"download_{i}"
+            )
 else:
     st.info("画像をアップロードしてください。")
