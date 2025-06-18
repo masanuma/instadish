@@ -85,16 +85,26 @@ def process_image(image):
 # 加工開始ボタン
 if uploaded_files:
     if st.button("📸 画像を加工してハッシュタグを提案"):
-        for uploaded_file in uploaded_files:
-            image = Image.open(uploaded_file).convert("RGB")
-            st.image(image, caption=f"元の画像: {uploaded_file.name}", use_column_width=True)
-            processed = process_image(image)
-            st.image(processed, caption="加工済み画像", use_column_width=True)
-            hashtags = generate_hashtags(business_type, target_audience)
-            st.subheader("📌 おすすめハッシュタグ")
-            st.code(" ".join(hashtags), language="markdown")
-            img_bytes = io.BytesIO()
-            processed.save(img_bytes, format="JPEG")
-            st.download_button("📥 加工画像をダウンロード", data=img_bytes.getvalue(), file_name="instadish_processed.jpg", mime="image/jpeg")
+        # 画像ごとに処理
+for uploaded_file in uploaded_files:
+    image = Image.open(uploaded_file).convert("RGB")
+    st.image(image, caption=f"元の画像: {uploaded_file.name}", use_container_width=True)
+    processed = process_image(image)
+    st.image(processed, caption="加工済み画像", use_container_width=True)
+
+    hashtags = generate_hashtags(business_type, target_audience)
+    st.subheader("📌 おすすめハッシュタグ")
+    st.code(" ".join(hashtags), language="markdown")
+
+    img_bytes = io.BytesIO()
+    processed.save(img_bytes, format="JPEG")
+
+    # 🔧 ダウンロードボタンにユニークなラベルをつける（ファイル名でOK！）
+    st.download_button(
+        label=f"📥 加工画像をダウンロード（{uploaded_file.name}）",
+        data=img_bytes.getvalue(),
+        file_name=f"instadish_{uploaded_file.name}",
+        mime="image/jpeg"
+    )
 else:
     st.info("上のフォームに画像をアップロードしてください。")
