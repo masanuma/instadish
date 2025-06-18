@@ -5,7 +5,7 @@ import uuid
 
 st.set_page_config(page_title="InstaDish | スマホ対応UI", layout="centered")
 
-# カスタムCSSでスマホ向けスタイル
+# カスタムCSSでスマホ向けスタイルとセクション背景色
 st.markdown("""
     <style>
     .block-container {
@@ -32,6 +32,18 @@ st.markdown("""
     h1 {
         white-space: nowrap;
     }
+    .section1 {
+        background-color: #fef3c7;
+        padding: 1em;
+        border-radius: 12px;
+        margin-bottom: 1em;
+    }
+    .section2 {
+        background-color: #e0f2fe;
+        padding: 1em;
+        border-radius: 12px;
+        margin-bottom: 1em;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -39,14 +51,17 @@ st.markdown("<h1>InstaDish 🍽️</h1>", unsafe_allow_html=True)
 st.caption("飲食店向けInstagram画像加工＋ハッシュタグ提案")
 
 st.markdown("""
-<h2 style='white-space: nowrap; font-size: 1.2rem; margin-top: 1.5em;'>
+<div class='section1'>
+<h2 style='white-space: nowrap; font-size: 1.2rem; margin-top: 0;'>
 1. 📷 写真をアップロード（複数可）
 </h2>
 """, unsafe_allow_html=True)
 uploaded_files = st.file_uploader("画像を選択してください", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+st.markdown("</div>", unsafe_allow_html=True)
 
 st.markdown("""
-<h2 style='white-space: nowrap; font-size: 1.2rem; margin-top: 1.5em;'>
+<div class='section2'>
+<h2 style='white-space: nowrap; font-size: 1.2rem; margin-top: 0;'>
 2. 🏷️ 業態とターゲット層
 </h2>
 """, unsafe_allow_html=True)
@@ -61,6 +76,7 @@ with st.expander("📸 撮影アドバイス"):
     - **複数皿の料理**：奥行きを出すように45度で
     - **ラベル重視**：中央配置＋明るさ重視
     """)
+st.markdown("</div>", unsafe_allow_html=True)
 
 def process_image(image):
     enhancer = ImageEnhance.Brightness(image).enhance(1.2)
