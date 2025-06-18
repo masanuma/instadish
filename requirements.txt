@@ -1,7 +1,6 @@
 streamlit
 pillow
 opencv-python-headless
-opencv-python
 torch
 torchvision
 ftfy
