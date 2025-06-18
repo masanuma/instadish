@@ -21,9 +21,8 @@ st.markdown("""
         background-color: #ffedd5;
         color: #111827;
     }
-    .stSelectbox label, .stFileUploader label {
-        font-size: 1rem;
-        color: #374151;
+    .stSelectbox label, .stFileUploader label, .stSelectbox div, .stFileUploader div {
+        background-color: inherit;
     }
     .uploadedImage img {
         border-radius: 12px;
@@ -32,14 +31,13 @@ st.markdown("""
     h1 {
         white-space: nowrap;
     }
-    .section1 {
-        background-color: #fef3c7;
-        padding: 1em;
-        border-radius: 12px;
-        margin-bottom: 1em;
+    .section1, .section1 * {
+        background-color: #fef3c7 !important;
     }
-    .section2 {
-        background-color: #e0f2fe;
+    .section2, .section2 * {
+        background-color: #e0f2fe !important;
+    }
+    .section1, .section2 {
         padding: 1em;
         border-radius: 12px;
         margin-bottom: 1em;
