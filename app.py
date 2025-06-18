@@ -80,25 +80,26 @@ def generate_hashtags(business, audience):
     return sorted(set(tags))[:20]
 
 def process_image(image):
-    if max(image.size) > 1280:
-        image.thumbnail((1280, 1280))
     enhancer = ImageEnhance.Brightness(image).enhance(1.2)
     enhancer = ImageEnhance.Contrast(enhancer).enhance(1.3)
     return ImageEnhance.Sharpness(enhancer).enhance(2.0)
 
 if uploaded_files:
-    for i, file in enumerate(uploaded_files):
-        image = Image.open(file).convert("RGB")
-        st.image(image, caption=f"元の画像: {file.name}", use_container_width=True)
+    if st.button("📸 加工してハッシュタグを提案"):
+        model, preprocess, device = load_clip_model()
+        for file in uploaded_files:
+            key = str(uuid.uuid4())
+            image = Image.open(file).convert("RGB")
+            st.image(image, caption=f"元の画像: {file.name}", use_container_width=True)
 
-        if st.button(f"📸 加工開始（{file.name}）", key=f"process_{i}"):
             processed = process_image(image)
             st.image(processed, caption="加工済み画像", use_container_width=True)
 
             label, conf, all_labels = classify_image_clip(image)
 
             if conf < 0.5:
-                label = st.selectbox("📌 内容ジャンルを選択", all_labels, index=0, key=f"select_{i}")
+                st.warning(f"画像分類の信頼度が低いため、内容を選んでください（信頼度 {conf:.2f}）")
+                label = st.selectbox("📌 内容ジャンルを選択", all_labels, index=0, key=f"select_{key}")
             else:
                 st.markdown(f"📌 自動判定ジャンル：**{label}**（信頼度 {conf:.2f}）")
 
@@ -115,7 +116,7 @@ if uploaded_files:
                 data=img_bytes.getvalue(),
                 file_name=f"instadish_{file.name}",
                 mime="image/jpeg",
-                key=f"download_{i}"
+                key=f"dl_{key}"
             )
 else:
     st.info("画像をアップロードしてください。")
