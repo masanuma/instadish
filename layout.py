@@ -1,3 +1,6 @@
+# layout.py
+import streamlit as st
+
 def show_photo_advice():
     with st.expander("📷 撮影アドバイスを見る"):
         st.markdown("""
@@ -8,3 +11,4 @@ def show_photo_advice():
         - **複数皿の料理**：奥行きを出すように45度で
         - **パッケージやラベルが重要な場合**：中央配置＋明るさ重視
         """)
+
