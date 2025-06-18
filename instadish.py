@@ -5,7 +5,7 @@ import uuid
 
 st.set_page_config(page_title="InstaDish | スマホ対応UI", layout="centered")
 
-# カスタムCSSでスマホ向けスタイルとセクション背景色
+# スタイル調整
 st.markdown("""
     <style>
     .block-container {
@@ -14,6 +14,9 @@ st.markdown("""
         max-width: 480px;
         margin: auto;
     }
+    h1 {
+        white-space: nowrap;
+    }
     .stButton > button {
         font-size: 1.1rem;
         padding: 0.75em 1.5em;
@@ -21,49 +24,27 @@ st.markdown("""
         background-color: #ffedd5;
         color: #111827;
     }
-    h1 {
-        white-space: nowrap;
-    }
-    .section1 {
-        background-color: #fef3c7;
-        padding: 1.5em;
-        border-radius: 12px;
-        margin-bottom: 1em;
-    }
-    .section2 {
-        background-color: #e0f2fe;
-        padding: 1.5em;
-        border-radius: 12px;
-        margin-bottom: 1em;
-    }
-    .section1 label, .section1 .stMarkdown {
-        background-color: #fef3c7 !important;
-    }
-    .section1 [data-testid="stFileUploader"] > div {
-        background-color: #fef3c7 !important;
-        border: 1px solid #fcd34d;
-        border-radius: 12px;
-        padding: 1em;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    }
-    .section2 label, .section2 .stSelectbox, .section2 .stMarkdown {
-        background-color: #e0f2fe !important;
-    }
     </style>
 """, unsafe_allow_html=True)
 
 st.markdown("<h1>InstaDish 🍽️</h1>", unsafe_allow_html=True)
 st.caption("飲食店向けInstagram画像加工＋ハッシュタグ提案")
 
+# セクション1：アップロード
 with st.container():
-    st.markdown("<div class='section1'>", unsafe_allow_html=True)
-    st.markdown("<h2 style='white-space: nowrap; font-size: 1.2rem;'>1. 📷 写真をアップロード（複数可）</h2>", unsafe_allow_html=True)
-    uploaded_files = st.file_uploader("画像を選択してください", type=["jpg", "jpeg", "png"], accept_multiple_files=True, label_visibility="visible")
+    st.markdown("""
+        <div style='background-color:#fef3c7; padding: 1.5em; border-radius: 12px;'>
+        <h3 style='margin-top:0;'>1. 📷 写真をアップロード（複数可）</h3>
+    """, unsafe_allow_html=True)
+    uploaded_files = st.file_uploader("画像を選択してください", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
     st.markdown("</div>", unsafe_allow_html=True)
 
+# セクション2：業態とターゲット
 with st.container():
-    st.markdown("<div class='section2'>", unsafe_allow_html=True)
-    st.markdown("<h2 style='white-space: nowrap; font-size: 1.2rem;'>2. 🏷️ 業態とターゲット層</h2>", unsafe_allow_html=True)
+    st.markdown("""
+        <div style='background-color:#e0f2fe; padding: 1.5em; border-radius: 12px;'>
+        <h3 style='margin-top:0;'>2. 🏷️ 業態とターゲット層</h3>
+    """, unsafe_allow_html=True)
     business_type = st.selectbox("業態", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
     target_audience = st.selectbox("ターゲット層", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
 
