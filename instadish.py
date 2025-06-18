@@ -8,6 +8,13 @@ st.set_page_config(page_title="InstaDish | スマホ対応UI", layout="centered"
 # カスタムCSSでスマホ向けスタイルとセクション背景色
 st.markdown("""
     <style>
+    .section1 [data-testid="stFileUploader"] > div {
+    background-color: #fef3c7 !important;
+    border: 1px solid #fcd34d;
+    border-radius: 12px;
+    padding: 1em;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
     .block-container {
         padding-top: 1rem;
         padding-bottom: 2rem;
