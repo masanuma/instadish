@@ -2,34 +2,31 @@ import streamlit as st
 from PIL import Image, ImageEnhance
 import io
 import numpy as np
+import cv2
 import torch
 import clip
-import uuid
 
 st.set_page_config(page_title="InstaDish | 飲食店インスタ画像アプリ", layout="centered")
-st.markdown("""
-<style>
-section[data-testid="stFileUploader"] button { background-color: #fdd835; }
-div[data-testid="stSelectbox"] { margin-bottom: 0rem; }
-div[data-testid="stMarkdownContainer"] h2, div[data-testid="stMarkdownContainer"] h3 {
-  margin-bottom: 0.5rem;
-  margin-top: 0.5rem;
-}
-</style>
-""", unsafe_allow_html=True)
+st.title("InstaDish 🍽️ | 飲食店向けInstagram画像加工＋ハッシュタグ提案")
+st.caption("by Masashi")
 
-st.markdown("""
-<h1 style='text-align: center; white-space: nowrap;'>InstaDish 🍽️ | 飲食店向けInstagram画像加工＋ハッシュタグ提案</h1>
-<p style='text-align: center;'>by Masashi</p>
-""", unsafe_allow_html=True)
+st.header("1. 写真をアップロード（複数可）")
+uploaded_files = st.file_uploader("料理・ドリンクなどの写真を選んでください（複数選択OK）", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
-uploaded_files = st.file_uploader("ファイル選択", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+st.header("2. 業態とターゲット層を選択")
+business_type = st.selectbox("業態を選んでください", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
+target_audience = st.selectbox("ターゲット層を選んでください", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
 
-col1, col2 = st.columns(2)
-business_type = col1.selectbox("", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"], label_visibility="collapsed")
-target_audience = col2.selectbox("", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"], label_visibility="collapsed")
+with st.expander("📷 撮影アドバイスを見る"):
+    st.markdown("""
+    ### 📸 ジャンル別おすすめ撮影ポイント
+    - **ドリンク**：グラスの高さを活かして斜め下から
+    - **カフェメニュー**：真上から全体をきれいに
+    - **バーの雰囲気**：ラベルや照明を活かしたローアングル
+    - **複数皿の料理**：奥行きを出すように45度で
+    - **パッケージやラベルが重要な場合**：中央配置＋明るさ重視
+    """)
 
-@st.cache_resource
 def load_clip_model():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model, preprocess = clip.load("ViT-B/32", device=device)
@@ -87,9 +84,8 @@ def process_image(image):
     enhancer = ImageEnhance.Contrast(enhancer).enhance(1.3)
     return ImageEnhance.Sharpness(enhancer).enhance(2.0)
 
-if uploaded_files and st.button("\ud83d\udcf8 加工してハッシュタグを提案"):
+if uploaded_files and st.button("📸 画像を加工してハッシュタグを提案"):
     for i, file in enumerate(uploaded_files):
-        unique_key = str(uuid.uuid4())
         image = Image.open(file).convert("RGB")
         st.image(image, caption=f"元の画像: {file.name}", use_container_width=True)
 
@@ -100,24 +96,27 @@ if uploaded_files and st.button("\ud83d\udcf8 加工してハッシュタグを�
 
         if conf < 0.5:
             st.warning(f"画像分類の信頼度が低いため、内容を選んでください（信頼度 {conf:.2f}）")
-            label = st.selectbox("\ud83d\udccc 内容ジャンルを選択", all_labels, index=0, key=f"select_{unique_key}")
+            select_key = f"select_{file.name}_{i}"
+            label = st.selectbox("📌 内容ジャンルを選択", all_labels, index=0, key=select_key)
         else:
-            st.markdown(f"\ud83d\udccc 自動判定ジャンル：**{label}**（信頼度 {conf:.2f}）")
+            st.markdown(f"📌 自動判定ジャンル：**{label}**（信頼度 {conf:.2f}）")
 
-        st.subheader("\ud83d\udcdd 自動キャプション")
+        st.subheader("📝 自動キャプション")
         st.markdown(generate_caption(label))
 
-        st.subheader("\ud83d\udccc ハッシュタグ候補")
+        st.subheader("📌 ハッシュタグ候補")
         st.code(" ".join(generate_hashtags(business_type, target_audience)))
 
         img_bytes = io.BytesIO()
         processed.save(img_bytes, format="JPEG")
+
+        download_key = f"download_{file.name}_{i}"
         st.download_button(
-            label=f"\ud83d\udc45 加工画像をダウンロード（{file.name}）",
+            label=f"📥 加工画像をダウンロード（{file.name}）",
             data=img_bytes.getvalue(),
             file_name=f"instadish_{file.name}",
             mime="image/jpeg",
-            key=f"download_{unique_key}"
+            key=download_key
         )
 else:
-    st.info("\u753b\u50cf\u3092\u30a2\u30c3\u30d7\u30ed\u30fc\u30c9\u3057\u3066\u304f\u3060\u3055\u3044\u3002")
+    st.info("画像をアップロードしてください。")
