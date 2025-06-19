@@ -1,4 +1,4 @@
-# InstaDish - UI最終調整版（不要な角丸除去・背景修正）
+# InstaDish - コンパクトUIレイアウト調整版
 
 import streamlit as st
 from PIL import Image, ImageEnhance
@@ -11,18 +11,18 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- 背景とボタンスタイルのみCSS適用（.sectionは使わない） ---
+# --- スタイル修正：余白最小化・レイアウト詰め調整 ---
 st.markdown("""
     <style>
         .stApp {
             background-color: #fde7dc !important;
         }
         .block-container {
-            padding-top: 1.5rem;
-            padding-bottom: 1.5rem;
+            padding-top: 1rem;
+            padding-bottom: 1rem;
         }
         .title {
-            font-size: 2.5em;
+            font-size: 2.2em;
             text-align: center;
             font-weight: bold;
             color: #222;
@@ -31,24 +31,33 @@ st.markdown("""
         .subtitle {
             text-align: center;
             color: #666;
-            margin-bottom: 2em;
+            margin-bottom: 1.5em;
         }
         .upload-box {
             border: 2px dashed #ccc;
             border-radius: 12px;
-            padding: 2em;
+            padding: 1.2em;
             text-align: center;
             color: #333;
             font-weight: bold;
-            margin-bottom: 1em;
+            margin-bottom: 0.5em;
             background-color: #fff;
         }
         .stButton>button {
             background-color: #347EFF;
             color: white;
             font-weight: bold;
-            padding: 0.6em 1.5em;
+            padding: 0.4em 1.2em;
             border-radius: 10px;
+            margin-top: 0.5em;
+            margin-bottom: 0.5em;
+        }
+        label, .stSelectbox label {
+            font-size: 0.9em !important;
+            margin-bottom: 0.3em !important;
+        }
+        .stSelectbox, .stFileUploader, .stButton {
+            margin-bottom: 0.8em !important;
         }
     </style>
 """, unsafe_allow_html=True)
