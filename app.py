@@ -1,4 +1,4 @@
-# InstaDish - コンパクトUIレイアウト調整版
+# InstaDish - UI隙間最小化バージョン（精密調整）
 
 import streamlit as st
 from PIL import Image, ImageEnhance
@@ -11,15 +11,15 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- スタイル修正：余白最小化・レイアウト詰め調整 ---
+# --- CSS最適化：隙間詰め・上下マージン極小化 ---
 st.markdown("""
     <style>
         .stApp {
             background-color: #fde7dc !important;
         }
         .block-container {
-            padding-top: 1rem;
-            padding-bottom: 1rem;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
         }
         .title {
             font-size: 2.2em;
@@ -31,7 +31,7 @@ st.markdown("""
         .subtitle {
             text-align: center;
             color: #666;
-            margin-bottom: 1.5em;
+            margin-bottom: 1em;
         }
         .upload-box {
             border: 2px dashed #ccc;
@@ -40,8 +40,12 @@ st.markdown("""
             text-align: center;
             color: #333;
             font-weight: bold;
-            margin-bottom: 0.5em;
+            margin-bottom: 0em !important;
             background-color: #fff;
+        }
+        .stFileUploader, .stSelectbox, .stButton {
+            margin-top: -0.3em !important;
+            margin-bottom: 0.3em !important;
         }
         .stButton>button {
             background-color: #347EFF;
@@ -50,14 +54,12 @@ st.markdown("""
             padding: 0.4em 1.2em;
             border-radius: 10px;
             margin-top: 0.5em;
-            margin-bottom: 0.5em;
         }
-        label, .stSelectbox label {
-            font-size: 0.9em !important;
-            margin-bottom: 0.3em !important;
-        }
-        .stSelectbox, .stFileUploader, .stButton {
-            margin-bottom: 0.8em !important;
+        h3 {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 0.3em;
+            margin-top: 1em;
         }
     </style>
 """, unsafe_allow_html=True)
@@ -70,15 +72,13 @@ st.markdown("""
 
 # --- セクション 1: アップロード ---
 with st.container():
-    st.markdown("### 1 写真アップロード")
-    st.markdown("""
-    <div class='upload-box'>📷<br><span>画像を選んでください</span></div>
-    """, unsafe_allow_html=True)
+    st.markdown("<h3>1 写真アップロード</h3>", unsafe_allow_html=True)
+    st.markdown("<div class='upload-box'>📷<br><span>画像を選んでください</span></div>", unsafe_allow_html=True)
     uploaded_files = st.file_uploader("", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
 # --- セクション 2: 業態とターゲット選択 ---
 with st.container():
-    st.markdown("### 2 業態・ターゲット選択")
+    st.markdown("<h3>2 業態・ターゲット選択</h3>", unsafe_allow_html=True)
     business_type = st.selectbox("", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
     target_audience = st.selectbox("", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
 
