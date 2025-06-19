@@ -5,28 +5,34 @@ from config import BUSINESS_TYPES, TARGET_AUDIENCES
 from PIL import Image
 import io
 
-st.set_page_config(page_title="InstaDish | 写真加工デモ版", layout="centered")
+st.set_page_config(page_title="InstaDish | スマホ対応画像加工", layout="centered")
 
 st.markdown("""
 <style>
     .insta-header {
         text-align: center;
-        font-size: 48px;
+        font-size: 36px;
         font-weight: bold;
         margin-bottom: 0;
     }
     .insta-subtitle {
         text-align: center;
-        font-size: 16px;
+        font-size: 14px;
         color: gray;
         margin-top: 0;
     }
     .upload-box {
         border: 2px dashed #ccc;
-        padding: 30px;
+        padding: 20px;
         text-align: center;
-        border-radius: 10px;
-        background-color: #fafafa;
+        border-radius: 12px;
+        background-color: #fffdfc;
+        margin-bottom: 16px;
+    }
+    .section-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 8px;
     }
 </style>
 <div class='insta-header'>InstaDish</div>
@@ -34,17 +40,14 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- セクション1: 写真アップロード ---
-st.markdown("## 1. 写真をアップロード")
+st.markdown("<div class='section-title'>① 写真アップロード</div>", unsafe_allow_html=True)
 st.markdown("""
-<div class='upload-box'>
-    📷<br>
-    <span style='color:gray;'>画像をアップロードしてください</span>
-</div>
+<div class='upload-box'>📷<br><span style='color:gray;'>画像を選んでください</span></div>
 """, unsafe_allow_html=True)
 uploaded_files = st.file_uploader("", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 
 # --- セクション2: 業態とターゲット層選択 ---
-st.markdown("## 2. 業態とターゲット層を選択")
+st.markdown("<div class='section-title'>② 業態・ターゲット選択</div>", unsafe_allow_html=True)
 business_type = st.selectbox("", BUSINESS_TYPES)
 target_audience = st.selectbox("", TARGET_AUDIENCES)
 
