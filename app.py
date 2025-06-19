@@ -1,81 +1,76 @@
 import streamlit as st
-import uuid
-from processor import process_image
-from config import BUSINESS_TYPES, TARGET_AUDIENCES
-from PIL import Image
+from PIL import Image, ImageEnhance
 import io
+import uuid
 
-st.set_page_config(page_title="InstaDish | スマホ対応画像加工", layout="centered")
+# ページ設定
+st.set_page_config(page_title="InstaDish | 写真加工デモ", layout="centered")
 
+# カスタムCSSでスタイル調整
 st.markdown("""
-<style>
-    .insta-header {
-        text-align: center;
-        font-size: 36px;
-        font-weight: bold;
-        margin-bottom: 0;
-    }
-    .insta-subtitle {
-        text-align: center;
-        font-size: 14px;
-        color: gray;
-        margin-top: 0;
-    }
-    .upload-box {
-        border: 2px dashed #ccc;
-        padding: 20px;
-        text-align: center;
-        border-radius: 12px;
-        background-color: #fffdfc;
-        margin-bottom: 16px;
-    }
-    .section-title {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 8px;
-    }
-</style>
-<div class='insta-header'>InstaDish</div>
-<div class='insta-subtitle'>飲食店向け画像加工＋ハッシュタグ提案</div>
+    <style>
+        body {
+            background: linear-gradient(to bottom right, #f8e1dc, #fbeee6);
+            font-family: "Helvetica Neue", sans-serif;
+        }
+        .title {
+            font-size: 2.2em;
+            text-align: center;
+            margin-bottom: 1em;
+            color: #333;
+        }
+        .card {
+            background-color: white;
+            padding: 1.5em;
+            border-radius: 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2em;
+        }
+        .section-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 0.5em;
+            color: #555;
+        }
+    </style>
 """, unsafe_allow_html=True)
 
-# --- セクション1: 写真アップロード ---
-st.markdown("<div class='section-title'>① 写真アップロード</div>", unsafe_allow_html=True)
-st.markdown("""
-<div class='upload-box'>📷<br><span style='color:gray;'>画像を選んでください</span></div>
-""", unsafe_allow_html=True)
-uploaded_files = st.file_uploader("", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+# タイトル
+st.markdown('<div class="title">📸 InstaDish | 写真加工デモ版</div>', unsafe_allow_html=True)
 
-# --- セクション2: 業態とターゲット層選択 ---
-st.markdown("<div class='section-title'>② 業態・ターゲット選択</div>", unsafe_allow_html=True)
-business_type = st.selectbox("", BUSINESS_TYPES)
-target_audience = st.selectbox("", TARGET_AUDIENCES)
+# アップロードカード
+with st.container():
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="section-title">1. 写真をアップロード（複数可）</div>', unsafe_allow_html=True)
+    uploaded_files = st.file_uploader("画像を選択", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 実行ボタン ---
-if st.button("📸 画像を加工"):
-    if uploaded_files:
-        for file in uploaded_files:
-            img = Image.open(file).convert("RGB")
-            st.image(img, caption=f"元の画像: {file.name}", use_container_width=True)
+def process_image(image):
+    image = ImageEnhance.Brightness(image).enhance(1.2)
+    image = ImageEnhance.Contrast(image).enhance(1.3)
+    image = ImageEnhance.Sharpness(image).enhance(2.0)
+    return image
 
-            processed = process_image(img)
-            st.image(processed, caption="✨ 加工済み画像", use_container_width=True)
+# 画像処理カード
+if uploaded_files:
+    for file in uploaded_files:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown(f'<div class="section-title">📷 元の画像: {file.name}</div>', unsafe_allow_html=True)
+        img = Image.open(file).convert("RGB")
+        st.image(img, use_container_width=True)
 
-            img_bytes = io.BytesIO()
-            processed.save(img_bytes, format="JPEG")
+        processed = process_image(img)
+        st.markdown('<div class="section-title">✨ 加工済み画像</div>', unsafe_allow_html=True)
+        st.image(processed, use_container_width=True)
 
-            st.download_button(
-                label=f"📥 ダウンロード（{file.name}）",
-                data=img_bytes.getvalue(),
-                file_name=f"processed_{file.name}",
-                mime="image/jpeg",
-                key=str(uuid.uuid4())
-            )
-    else:
-        st.warning("画像をアップロードしてください。")
+        img_bytes = io.BytesIO()
+        processed.save(img_bytes, format="JPEG")
 
-# --- フッター ---
-st.markdown("""
----
-<p style='text-align: center; color: gray;'>InstaDish by Masashi ｜ ご意見・ご感想はお気軽にどうぞ</p>
-""", unsafe_allow_html=True)
+        st.download_button(
+            label=f"📥 加工画像をダウンロード（{file.name}）",
+            data=img_bytes.getvalue(),
+            file_name=f"processed_{file.name}",
+            mime="image/jpeg",
+            key=str(uuid.uuid4())
+        )
+        st.markdown('</div>', unsafe_allow_html=True)
