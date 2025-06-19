@@ -1,4 +1,4 @@
-# InstaDish - 完全スマホ対応UI
+# InstaDish - スマホUI修正版
 
 import streamlit as st
 from PIL import Image, ImageEnhance
@@ -11,10 +11,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# --- カスタムスタイル: グラデーション背景・カードレイアウト ---
+# --- スタイル調整（背景色・カードレイアウト・余白修正） ---
 st.markdown("""
     <style>
-        body {
+        .stApp {
             background: linear-gradient(160deg, #fff1e8 0%, #fde7dc 100%) !important;
         }
         .block-container {
@@ -26,18 +26,18 @@ st.markdown("""
             text-align: center;
             font-weight: bold;
             color: #222;
-            margin-bottom: 0.5em;
+            margin-bottom: 0.2em;
         }
         .subtitle {
             text-align: center;
             color: #666;
             margin-bottom: 2em;
         }
-        .card {
+        .section {
             background-color: white;
-            padding: 1.5em;
+            padding: 1.2em;
             border-radius: 20px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.06);
             margin-bottom: 2em;
         }
         .upload-box {
@@ -68,8 +68,8 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # --- セクション 1: アップロード ---
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.markdown("### 1. 写真アップロード", unsafe_allow_html=True)
+st.markdown("<div class='section'>", unsafe_allow_html=True)
+st.markdown("### 1 写真アップロード", unsafe_allow_html=True)
 st.markdown("""
 <div class='upload-box'>
     📷<br><span>画像を選んでください</span>
@@ -79,14 +79,14 @@ uploaded_files = st.file_uploader("", type=["jpg", "jpeg", "png"], accept_multip
 st.markdown("</div>", unsafe_allow_html=True)
 
 # --- セクション 2: 業態とターゲット選択 ---
-st.markdown("<div class='card'>", unsafe_allow_html=True)
-st.markdown("### 2. 業態・ターゲット選択", unsafe_allow_html=True)
-business_type = st.selectbox("業態を選んでください", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
-target_audience = st.selectbox("ターゲット層を選んでください", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
+st.markdown("<div class='section'>", unsafe_allow_html=True)
+st.markdown("### 2 業態・ターゲット選択", unsafe_allow_html=True)
+business_type = st.selectbox("", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
+target_audience = st.selectbox("", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
 st.markdown("</div>", unsafe_allow_html=True)
 
-# --- セクション 3: 実行ボタン ---
-st.markdown("<div class='card'>", unsafe_allow_html=True)
+# --- セクション 3: 実行ボタン＋加工結果 ---
+st.markdown("<div class='section'>", unsafe_allow_html=True)
 if st.button("画像を加工"):
     if uploaded_files:
         for file in uploaded_files:
