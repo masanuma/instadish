@@ -1,5 +1,4 @@
-# このファイルは、InstaDishの新UI仕様に基づくStreamlitアプリのベースコードです。
-# ユーザー提供のモックアップに忠実なデザインとモバイル最適化を実装します。
+# InstaDish - 完全スマホ対応UI
 
 import streamlit as st
 from PIL import Image, ImageEnhance
@@ -12,72 +11,102 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# カスタムCSSでスマホUI最適化
+# --- カスタムスタイル: グラデーション背景・カードレイアウト ---
 st.markdown("""
     <style>
-    body {
-        background-color: #f8f7f3;
-    }
-    .block-container {
-        padding-top: 1rem;
-        padding-bottom: 1rem;
-    }
-    .stButton>button, .stDownloadButton>button {
-        border-radius: 16px;
-        padding: 0.6rem 1.2rem;
-        font-size: 1rem;
-    }
-    .stMarkdown h1, .stMarkdown h2, .stMarkdown h3 {
-        color: #333333;
-        margin-bottom: 0.6rem;
-    }
-    .upload-section, .preview-section {
-        background: white;
-        padding: 1rem;
-        border-radius: 1rem;
-        margin-bottom: 1rem;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-    }
+        body {
+            background: linear-gradient(160deg, #fff1e8 0%, #fde7dc 100%) !important;
+        }
+        .block-container {
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+        }
+        .title {
+            font-size: 2.5em;
+            text-align: center;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 0.5em;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2em;
+        }
+        .card {
+            background-color: white;
+            padding: 1.5em;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+            margin-bottom: 2em;
+        }
+        .upload-box {
+            border: 2px dashed #ccc;
+            border-radius: 12px;
+            padding: 2em;
+            text-align: center;
+            color: #333;
+            font-weight: bold;
+        }
+        .upload-box span {
+            font-size: 1.1em;
+        }
+        .stButton>button {
+            background-color: #347EFF;
+            color: white;
+            font-weight: bold;
+            padding: 0.6em 1.5em;
+            border-radius: 10px;
+        }
     </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h1 style='text-align: center;'>📸 InstaDish</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align: center;'>飲食店向けInstagram用の写真自動加工デモ</p>", unsafe_allow_html=True)
+# --- ヘッダー ---
+st.markdown("""
+<div class='title'>InstaDish</div>
+<div class='subtitle'>飲食店向け画像加工＋ハッシュタグ提案</div>
+""", unsafe_allow_html=True)
 
-# アップロードセクション
-st.markdown("<div class='upload-section'>", unsafe_allow_html=True)
-st.subheader("画像アップロード")
-uploaded_files = st.file_uploader("画像を選択（複数可）", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
+# --- セクション 1: アップロード ---
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.markdown("### 1. 写真アップロード", unsafe_allow_html=True)
+st.markdown("""
+<div class='upload-box'>
+    📷<br><span>画像を選んでください</span>
+</div>
+""", unsafe_allow_html=True)
+uploaded_files = st.file_uploader("", type=["jpg", "jpeg", "png"], accept_multiple_files=True)
 st.markdown("</div>", unsafe_allow_html=True)
 
-# 加工処理関数
-def process_image(image):
-    image = ImageEnhance.Brightness(image).enhance(1.2)
-    image = ImageEnhance.Contrast(image).enhance(1.3)
-    image = ImageEnhance.Sharpness(image).enhance(2.0)
-    return image
+# --- セクション 2: 業態とターゲット選択 ---
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+st.markdown("### 2. 業態・ターゲット選択", unsafe_allow_html=True)
+business_type = st.selectbox("業態を選んでください", ["和食", "洋食", "中華", "居酒屋", "バー", "エスニック", "カフェ"])
+target_audience = st.selectbox("ターゲット層を選んでください", ["インスタ好き", "外国人観光客", "会社員", "シニア", "OL"])
+st.markdown("</div>", unsafe_allow_html=True)
 
-# プレビューセクション
-if uploaded_files:
-    st.markdown("<div class='preview-section'>", unsafe_allow_html=True)
-    st.subheader("加工プレビュー")
-    for file in uploaded_files:
-        img = Image.open(file).convert("RGB")
-        st.image(img, caption=f"元の画像: {file.name}", use_container_width=True)
+# --- セクション 3: 実行ボタン ---
+st.markdown("<div class='card'>", unsafe_allow_html=True)
+if st.button("画像を加工"):
+    if uploaded_files:
+        for file in uploaded_files:
+            img = Image.open(file).convert("RGB")
+            processed = ImageEnhance.Brightness(img).enhance(1.2)
+            processed = ImageEnhance.Contrast(processed).enhance(1.3)
+            processed = ImageEnhance.Sharpness(processed).enhance(2.0)
 
-        processed = process_image(img)
-        st.image(processed, caption="加工済み画像", use_container_width=True)
+            st.image(img, caption=f"元の画像: {file.name}", use_container_width=True)
+            st.image(processed, caption="✨ 加工済み画像", use_container_width=True)
 
-        img_bytes = io.BytesIO()
-        processed.save(img_bytes, format="JPEG")
-
-        st.download_button(
-            label=f"📥 加工画像をダウンロード（{file.name}）",
-            data=img_bytes.getvalue(),
-            file_name=f"processed_{file.name}",
-            mime="image/jpeg",
-            key=str(uuid.uuid4())
-        )
-    st.markdown("</div>", unsafe_allow_html=True)
-else:
-    st.info("画像をアップロードしてください。")
+            img_bytes = io.BytesIO()
+            processed.save(img_bytes, format="JPEG")
+            st.download_button(
+                label=f"📥 ダウンロード（{file.name}）",
+                data=img_bytes.getvalue(),
+                file_name=f"processed_{file.name}",
+                mime="image/jpeg",
+                key=str(uuid.uuid4())
+            )
+    else:
+        st.warning("画像をアップロードしてください。")
+st.markdown("</div>", unsafe_allow_html=True)
